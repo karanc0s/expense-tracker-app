@@ -6,46 +6,79 @@ import android.content.Intent
 import android.provider.Telephony
 import android.telephony.SmsMessage
 import android.util.Log
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+
+import androidx.work.workDataOf
+import com.karan.expensetracker.models.MultipartMessage
+import com.karan.expensetracker.models.Message
+import com.karan.expensetracker.worker.ApiWorker
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class SmsReceiver : BroadcastReceiver() {
 
+    @Inject lateinit var workManager : WorkManager
+
     override fun onReceive(context: Context, intent: Intent) {
-        // This method is called when the BroadcastReceiver is receiving an Intent broadcast.
-        Log.e("TAG", "onReceive: Something has received", )
+
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
-            Log.e("TAG", "onReceive: Messages  ${isTransactionSMS("" , "")}", )
             val bundle = intent.extras
             bundle?.let {
-                val pdus = it.get("pdus") as Array<*>?
+                val pdu = it.get("pdus") as Array<*>
                 val format = it.getString("format") as String
-                pdus?.let { array ->
-                    val messages = array.map { pdu ->
-                        val smsMessage = SmsMessage.createFromPdu(pdu as ByteArray , format)
-                        "From: ${smsMessage.displayOriginatingAddress}\nMessage: ${smsMessage.messageBody}"
-                    }
-                    // Handle messages (e.g., show notification, process data)
-                    Log.e("TAG", "onReceive: $messages", )
-                }
+                val message : Message = convertIntoMsg(pdu , format)
+                Log.e("TAG", "onReceive: $message", )
+
+                val workRequest = OneTimeWorkRequestBuilder<ApiWorker>()
+                    .setInputData(workDataOf("data" to message.message))
+                    .build()
+
+                workManager.enqueue(workRequest)
+
             }
 
-        }
 
+        }
     }
 
 
 
+    private fun convertIntoMsg(pdus : Array<*> , format : String) : Message{
+
+        var timestamp : Long = 0L
+        var from : String = ""
 
 
+        val multipartMsg : List<MultipartMessage>?  = pdus.map { msgByte ->
+            val pdus = msgByte as ByteArray
+            val smsMessage = SmsMessage.createFromPdu(pdus , format)
 
+            timestamp = smsMessage.timestampMillis
+            from = smsMessage.displayOriginatingAddress
 
+            MultipartMessage(
+                from = smsMessage.displayOriginatingAddress,
+                message = smsMessage.messageBody,
+                data = pdus
+            )
+        }
 
+        val message : StringBuilder = StringBuilder()
+        multipartMsg?.forEach { msg ->
+            message.append(msg.message)
+        }
 
+        return Message(
+            from = from,
+            message = message.toString(),
+            timestamp = timestamp
+        )
+    }
 
-
-
-    fun isTransactionSMS(messageBody: String, sender: String): Boolean {
+    private fun isTransactionSMS(messageBody: String, sender: String): Boolean {
         // Check sender (optional: known bank shortcodes)
         val isBankSender = sender in listOf("ABCBK", "BANKXYZ", "PAY" , "ICICI")
 
@@ -75,5 +108,5 @@ class SmsReceiver : BroadcastReceiver() {
                 } ||
                 transactionRegex.containsMatchIn(messageBody)
     }
-}
 
+}

@@ -65,6 +65,10 @@ dependencies {
     //permissions
     implementation("com.google.accompanist:accompanist-permissions:0.37.2")
 
+    //workmanager
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
