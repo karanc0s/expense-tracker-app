@@ -1,6 +1,7 @@
-package com.karan.expensetracker.ui.screens
+package com.karan.expensetracker.presentation.ui.screens
 
 
+import android.Manifest
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,11 +18,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
-import com.karan.expensetracker.navigation.Screen
+import com.karan.expensetracker.presentation.navigation.Screen
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -29,12 +28,12 @@ import com.karan.expensetracker.navigation.Screen
 fun PermissionScreen(navController: NavController) {
 
     val permission = rememberPermissionState(
-        android.Manifest.permission.READ_SMS
+        Manifest.permission.READ_SMS
     )
     val per = rememberMultiplePermissionsState(
         listOf(
-            android.Manifest.permission.READ_SMS,
-            android.Manifest.permission.RECEIVE_SMS
+            Manifest.permission.READ_SMS,
+            Manifest.permission.RECEIVE_SMS
         )
     )
 

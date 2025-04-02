@@ -1,4 +1,4 @@
-package com.karan.expensetracker
+package com.karan.expensetracker.app
 
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory

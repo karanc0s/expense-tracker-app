@@ -61,6 +61,7 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.8.9")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     //permissions
     implementation("com.google.accompanist:accompanist-permissions:0.37.2")
@@ -68,6 +69,20 @@ dependencies {
     //workmanager
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.hilt:hilt-work:1.2.0")
+
+    //vm
+
+    implementation("androidx.compose.material:material-icons-extended-android:1.7.8")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
+
+
+    //retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //interceptor
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
 
 
     testImplementation(libs.junit)
